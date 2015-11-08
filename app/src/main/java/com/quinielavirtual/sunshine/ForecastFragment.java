@@ -44,9 +44,23 @@ public class ForecastFragment extends Fragment {
     //endregion
 
     //region Fragment Implements
+
+    /**
+     * Se crea antes de onCreatedView y con eso le decimos al código que tiene que sobreescribir el
+     * método de onCreateOptionsMenu para agregar opciones de menu.
+     * @param savedInstanceState
+     * @return
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         try {
 //            webservice web = new webservice();
@@ -87,9 +101,7 @@ public class ForecastFragment extends Fragment {
 
 
     @Override
-    public void onCreateOptionsMenu(
-            Menu menu, MenuInflater inflater) {
-        setHasOptionsMenu(true);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
@@ -102,6 +114,8 @@ public class ForecastFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_fresh) {
+            FetchWeatherTask task = new FetchWeatherTask();
+            task.execute();
             return true;
         }
 
@@ -111,7 +125,7 @@ public class ForecastFragment extends Fragment {
 
     public class FetchWeatherTask extends AsyncTask<Void, Void, Void> {
 
-        private final  String LOG_TAG = FetchWeatherTask.class.getSimpleName();
+        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
@@ -127,7 +141,7 @@ public class ForecastFragment extends Fragment {
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
 
-                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
+                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7&appid=e288bfc52c9b791e0b92586e628b56cc");
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -156,6 +170,7 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
+                Log.v(LOG_TAG,"Forecast JSON String:" + forecastJsonStr);
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping

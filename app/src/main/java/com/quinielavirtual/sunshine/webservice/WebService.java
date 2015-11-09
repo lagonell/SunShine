@@ -1,7 +1,15 @@
 package com.quinielavirtual.sunshine.webservice;
 
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import com.quinielavirtual.sunshine.R;
+
+import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,10 +23,10 @@ import java.util.Map;
 /**
  * Created by a451383 on 05/11/2015.
  */
-public class webservice extends AsyncTask<String,Void,String > {
+public class WebService extends AsyncTask<Map<String, String>, Void, String[]> {
 
     //region fields
-    private final  String LOG_TAG = webservice.class.getSimpleName();
+    private final String LOG_TAG = WebService.class.getSimpleName();
     // These two need to be declared outside the try/catch
     // so that they can be closed in the finally block.
     HttpURLConnection urlConnection = null;
@@ -27,38 +35,37 @@ public class webservice extends AsyncTask<String,Void,String > {
     String forecastJsonStr = null;
     private Map<String, String> urlParameters = new HashMap<>();
     private URL url;
-    private String urlBase;
+
+    FragmentActivity fragmentActivity;
     //endregion
 
     //region Properties
-    public Map<String, String> getUrlParameters() {
-        return urlParameters;
-    }
 
-    public void setUrlParameters(Map<String, String> urlParameters) {
-        this.urlParameters = urlParameters;
-    }
     //endregion
 
     //region constructor
-//    public webservice(String url) {
-//        urlBase = url;
-//    }
+    public WebService(FragmentActivity frament) {
+        fragmentActivity = frament;
+    }
     //endregion
 
     //region method publics
-    private String ConnectionWebservice() {
+    private String[] ConnectionWebservice() {
         try {
             // Construct the URL for the OpenWeatherMap query
             // Possible parameters are avaiable at OWM's forecast API page, at
-            // http://openweathermap.org/API#forecast
-            String internalParameters = "";
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme("http")
+                    .authority(urlParameters.get("UrlBase").toString())
+                    .path("data/2.5/forecast/daily");
+
             for (Map.Entry<String, String> item : urlParameters.entrySet()) {
-                internalParameters = internalParameters + String.format("%1$s=%2$s&", item.getKey(), item.getValue());
+                if (!item.getKey().contains("UrlBase"))
+                    builder.appendQueryParameter(item.getKey(), item.getValue());
             }
 
-            url = new URL(urlBase + internalParameters.substring(0, internalParameters.length() - 1));
-
+//            Log.v(LOG_TAG, builder.build().toString());
+            url = new URL(builder.build().toString());
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
@@ -86,7 +93,15 @@ public class webservice extends AsyncTask<String,Void,String > {
                 return null;
             }
             forecastJsonStr = buffer.toString();
+//            Log.v(LOG_TAG, "Forecast JSON String:" + forecastJsonStr);
+            WeatherDataParser parser = new WeatherDataParser();
+            return parser.getWeatherDataFromJson(forecastJsonStr, 7);
         } catch (IOException e) {
+            Log.e(LOG_TAG, "Error ", e);
+            // If the code didn't successfully get the weather data, there's no point in attemping
+            // to parse it.
+            return null;
+        } catch (JSONException e) {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attemping
             // to parse it.
@@ -102,14 +117,28 @@ public class webservice extends AsyncTask<String,Void,String > {
                     Log.e(LOG_TAG, "Error closing stream", e);
                 }
             }
-            return forecastJsonStr;
+
         }
     }
 
     @Override
-    protected String doInBackground(String... params) {
-        urlBase = params[0].toString();
+    protected String[] doInBackground(Map<String, String>... params) {
+        if (params.length < 0)
+            return null;
+        urlParameters = params[0];
         return ConnectionWebservice();
+    }
+
+    @Override
+    protected void onPostExecute(String[] result) {
+        if(result != null)
+        {
+            ArrayAdapter<String> adapterData = new ArrayAdapter<>(fragmentActivity,
+                    R.layout.list_item_forecast, R.id.list_item_forecast_textview, result);
+            //adapterData.notifyDataSetChanged();
+            ListView listView = (ListView) fragmentActivity.findViewById(R.id.listview_forecast);
+            listView.setAdapter(adapterData);
+        }
     }
     //endregion
 }

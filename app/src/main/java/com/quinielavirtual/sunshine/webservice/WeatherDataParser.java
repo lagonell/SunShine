@@ -1,5 +1,11 @@
 package com.quinielavirtual.sunshine.webservice;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
+
+import com.quinielavirtual.sunshine.R;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,25 +19,11 @@ import java.util.Calendar;
 public class WeatherDataParser {
 
     private final String LOG_TAG = WebService.class.getSimpleName();
+    private FragmentActivity fragmentActivity;
 
-//    /**
-//     * Given a string of the form returned by the api call:
-//     * http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7
-//     * retrieve the maximum temperature for the day indicated by dayIndex
-//     * (Note: 0-indexed, so 0 would refer to the first day).
-//     */
-//    public static double getMaxTemperatureForDay(String weatherJsonStr, int dayIndex)
-//            throws JSONException {
-//        if (weatherJsonStr != null) {
-//            JSONObject json = new JSONObject(weatherJsonStr);
-//            JSONObject objList = json.getJSONArray("list").getJSONObject(dayIndex - 1);
-//            JSONObject objTemp = objList.getJSONObject("temp");
-//            return objTemp.getDouble("max");
-//
-//        }
-//        return -1;
-//    }
-
+    public WeatherDataParser(FragmentActivity fragmentActivity) {
+        this.fragmentActivity = fragmentActivity;
+    }
 
     private String getReadableDateString(long time) {
         // Because the API returns a unix timestamp (measured in seconds),
@@ -45,6 +37,16 @@ public class WeatherDataParser {
      */
     private String formatHighLows(double high, double low) {
         // For presentation, assume the user doesn't care about tenths of a degree.
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(fragmentActivity);
+
+        String unitType = prefs.getString(fragmentActivity.getString(R.string.pref_key_temperature),
+                fragmentActivity.getString(R.string.pref_default_temperature_units));
+
+        if (!unitType.equals(fragmentActivity.getString(R.string.pref_default_temperature_units))) {
+            high = (high * 1.8) + 32;
+            low = (low * 1.8) + 32;
+        }
+
         long roundedHigh = Math.round(high);
         long roundedLow = Math.round(low);
 

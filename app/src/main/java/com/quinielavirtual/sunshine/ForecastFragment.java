@@ -1,6 +1,8 @@
 package com.quinielavirtual.sunshine;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,6 +37,13 @@ public class ForecastFragment extends Fragment {
     //endregion
 
     //region Fragment Implements
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
 
     /**
      * Se crea antes de onCreatedView y con eso le decimos al código que tiene que sobreescribir el
@@ -72,19 +81,25 @@ public class ForecastFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_fresh) {
-
-            WebService web = new WebService(getActivity());
-            parametersSunshine.put("UrlBase", "api.openweathermap.org");
-            parametersSunshine.put("q", "Madrid");
-            parametersSunshine.put("mode", "json");
-            parametersSunshine.put("units", "metric");
-            parametersSunshine.put("cnt", "7");
-            parametersSunshine.put("appid", "e288bfc52c9b791e0b92586e628b56cc");
-            web.execute(parametersSunshine);
+            updateWeather();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    //endregion
+
+    //region Method private
+    private void updateWeather() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        WebService web = new WebService(getActivity());
+        parametersSunshine.put("UrlBase", "api.openweathermap.org");
+        parametersSunshine.put("q", prefs.getString(getString(R.string.pref_key_location), ""));
+        parametersSunshine.put("mode", "json");
+        parametersSunshine.put("units", prefs.getString(getString(R.string.pref_key_temperature),getString(R.string.pref_default_temperature_units)));
+        parametersSunshine.put("cnt", "7");
+        parametersSunshine.put("appid", BuildConfig.OPEN_WEATHER_MAP_API_KEY);
+        web.execute(parametersSunshine);
     }
     //endregion
 

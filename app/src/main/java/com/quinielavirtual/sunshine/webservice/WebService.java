@@ -1,12 +1,16 @@
 package com.quinielavirtual.sunshine.webservice;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.quinielavirtual.sunshine.DetailActivity;
 import com.quinielavirtual.sunshine.R;
 
 import org.json.JSONException;
@@ -36,7 +40,7 @@ public class WebService extends AsyncTask<Map<String, String>, Void, String[]> {
     private Map<String, String> urlParameters = new HashMap<>();
     private URL url;
 
-    FragmentActivity fragmentActivity;
+    private FragmentActivity fragmentActivity;
     //endregion
 
     //region Properties
@@ -94,7 +98,7 @@ public class WebService extends AsyncTask<Map<String, String>, Void, String[]> {
             }
             forecastJsonStr = buffer.toString();
 //            Log.v(LOG_TAG, "Forecast JSON String:" + forecastJsonStr);
-            WeatherDataParser parser = new WeatherDataParser();
+            WeatherDataParser parser = new WeatherDataParser(fragmentActivity);
             return parser.getWeatherDataFromJson(forecastJsonStr, 7);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
@@ -131,13 +135,19 @@ public class WebService extends AsyncTask<Map<String, String>, Void, String[]> {
 
     @Override
     protected void onPostExecute(String[] result) {
-        if(result != null)
-        {
-            ArrayAdapter<String> adapterData = new ArrayAdapter<>(fragmentActivity,
+        if (result != null) {
+            final ArrayAdapter<String> adapterData = new ArrayAdapter<>(fragmentActivity,
                     R.layout.list_item_forecast, R.id.list_item_forecast_textview, result);
-            //adapterData.notifyDataSetChanged();
             ListView listView = (ListView) fragmentActivity.findViewById(R.id.listview_forecast);
             listView.setAdapter(adapterData);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String forecast = adapterData.getItem(position);
+                    Intent intent = new Intent(fragmentActivity, DetailActivity.class).putExtra(Intent.EXTRA_TEXT,forecast);
+                    fragmentActivity.startActivity(intent);
+                }
+            });
         }
     }
     //endregion

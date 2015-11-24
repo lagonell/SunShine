@@ -62,6 +62,7 @@ public class DetailActivity extends AppCompatActivity {
 
 
         public PlaceholderFragment() {
+            setHasOptionsMenu(true);
         }
 
         @Override

@@ -94,9 +94,9 @@ public class ForecastFragment extends Fragment {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         WebService web = new WebService(getActivity());
         parametersSunshine.put("UrlBase", "api.openweathermap.org");
-        parametersSunshine.put("q", prefs.getString(getString(R.string.pref_key_location), ""));
+        parametersSunshine.put("q", prefs.getString(getString(R.string.pref_location_key), ""));
         parametersSunshine.put("mode", "json");
-        parametersSunshine.put("units", prefs.getString(getString(R.string.pref_key_temperature),getString(R.string.pref_default_temperature_units)));
+        parametersSunshine.put("units", prefs.getString(getString(R.string.pref_units_key),getString(R.string.pref_units_label_metric)));
         parametersSunshine.put("cnt", "7");
         parametersSunshine.put("appid", BuildConfig.OPEN_WEATHER_MAP_API_KEY);
         web.execute(parametersSunshine);

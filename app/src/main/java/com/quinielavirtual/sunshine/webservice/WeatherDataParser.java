@@ -39,10 +39,10 @@ public class WeatherDataParser {
         // For presentation, assume the user doesn't care about tenths of a degree.
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(fragmentActivity);
 
-        String unitType = prefs.getString(fragmentActivity.getString(R.string.pref_key_temperature),
-                fragmentActivity.getString(R.string.pref_default_temperature_units));
+        String unitType = prefs.getString(fragmentActivity.getString(R.string.pref_units_key),
+                fragmentActivity.getString(R.string.pref_units_label_metric));
 
-        if (!unitType.equals(fragmentActivity.getString(R.string.pref_default_temperature_units))) {
+        if (!unitType.equals(fragmentActivity.getString(R.string.pref_units_label_metric))) {
             high = (high * 1.8) + 32;
             low = (low * 1.8) + 32;
         }

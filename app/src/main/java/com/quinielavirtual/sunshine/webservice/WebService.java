@@ -67,8 +67,6 @@ public class WebService extends AsyncTask<Map<String, String>, Void, String[]> {
                 if (!item.getKey().contains("UrlBase"))
                     builder.appendQueryParameter(item.getKey(), item.getValue());
             }
-
-//            Log.v(LOG_TAG, builder.build().toString());
             url = new URL(builder.build().toString());
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();

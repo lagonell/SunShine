@@ -60,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
     private void openPreferredLocationInMap() {
         // For presentation, assume the user doesn't care about tenths of a degree.
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String location = prefs.getString(getString(R.string.pref_key_location),
-                getString(R.string.pref_default_location));
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
 
         Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
                 .appendQueryParameter("q", location).build();

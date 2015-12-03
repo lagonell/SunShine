@@ -1,5 +1,6 @@
 package com.quinielavirtual.sunshine;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -10,10 +11,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.quinielavirtual.sunshine.webservice.WebService;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.text.DateFormatSymbols;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -29,6 +32,7 @@ public class ForecastFragment extends Fragment {
     private Calendar rightNow = Calendar.getInstance();
     private String weekdays[] = new DateFormatSymbols(Locale.ENGLISH).getWeekdays();
     private Map<String, String> parametersSunshine = new HashMap<String, String>();
+    private ArrayAdapter<String> mForecastAdapter;
     //endregion
 
     //region Constructor
@@ -62,7 +66,31 @@ public class ForecastFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        // The ArrayAdapter will take data from a source and
+        // use it to populate the ListView it's attached to.
+        mForecastAdapter =
+                new ArrayAdapter<String>(
+                        getActivity(), // The current context (this activity)
+                        R.layout.list_item_forecast, // The name of the layout ID.
+                        R.id.list_item_forecast_textview, // The ID of the textview to populate.
+                        new ArrayList<String>());
+
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        // Get a reference to the ListView, and attach this adapter to it.
+        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        listView.setAdapter(mForecastAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                String forecast = mForecastAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(intent);
+            }
+        });
+
         return rootView;
     }
 
@@ -91,15 +119,11 @@ public class ForecastFragment extends Fragment {
 
     //region Method private
     private void updateWeather() {
+        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity(), mForecastAdapter);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        WebService web = new WebService(getActivity());
-        parametersSunshine.put("UrlBase", "api.openweathermap.org");
-        parametersSunshine.put("q", prefs.getString(getString(R.string.pref_location_key), ""));
-        parametersSunshine.put("mode", "json");
-        parametersSunshine.put("units", prefs.getString(getString(R.string.pref_units_key),getString(R.string.pref_units_label_metric)));
-        parametersSunshine.put("cnt", "7");
-        parametersSunshine.put("appid", BuildConfig.OPEN_WEATHER_MAP_API_KEY);
-        web.execute(parametersSunshine);
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        weatherTask.execute(location);
     }
     //endregion
 

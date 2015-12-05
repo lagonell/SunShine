@@ -24,6 +24,7 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/date_detail"
             style="@style/mediumText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,6 +39,7 @@
             android:paddingTop="@dimen/max_temp">
 
             <TextView
+                android:id="@+id/max_temperature"
                 style="@style/extraLargeText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -60,6 +62,7 @@
             android:paddingLeft="@dimen/margin_72">
 
             <TextView
+                android:id="@+id/min_temperature"
                 style="@style/largeText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -67,6 +70,7 @@
                 android:textColor="@color/Grey" />
 
             <TextView
+                android:id="@+id/description_name"
                 style="@style/mediumBigText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -81,12 +85,25 @@
             android:orientation="vertical"
             android:paddingTop="@dimen/activity_vertical_margin">
 
-            <TextView
-                style="@style/mediumBigText"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/humidity"
-                android:textColor="@color/Grey" />
+                android:layout_height="wrap_content" android:orientation="horizontal">
+                <TextView
+                    style="@style/mediumBigText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/humidity"
+                    android:textColor="@color/Grey" />
+                <TextView
+                    android:id="@+id/humidity"
+                    style="@style/mediumBigText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/humidity"
+                    android:textColor="@color/Grey" />
+            </LinearLayout>
+
+
 
             <TextView
                 style="@style/mediumBigText"

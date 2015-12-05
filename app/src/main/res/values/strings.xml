@@ -3,7 +3,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="today">Today</string>
     <string name="max_temp">22º</string>
-    <string name="humidity">Humidity: 71%</string>
+    <string name="humidity">Humidity:</string>
     <string name="presure">Presure: 1016hPa</string>
     <string name="wind">Wind: 2 km/h NW</string>
     <string name="clear">Clear</string>
